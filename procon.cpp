@@ -1,7 +1,5 @@
 #ifndef _COLORS_
-
 #define _COLORS_
-
 
 /* FOREGROUND */
 
@@ -41,7 +39,6 @@
 
 #define UNDL(x) "\x1B[4m" x RST
 
-
 #endif  /* _COLORS_ */
 
 #include<iostream>
@@ -56,6 +53,8 @@ using namespace std;
 
 //  Declare A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) coordinates as global variables
 int A1 = 1, A2 = 1, B1 = M-2, B2 = N-2, C1 = 1, C2 = N-2, D1 = M-2, D2 = 1;  
+// Variables for saving A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) to check the conflict
+int saveA1 = 1, saveA2 = 1, saveB1 = M-2, saveB2 = N-2, saveC1 = 1, saveC2 = N-2, saveD1 = M-2, saveD2 = 1;
 // Declare point types as global variables   
 int tilePointOne = 0, tilePointTwo = 0, areaPointOne = 0, areaPointTwo = 0, sumOne = 0, sumTwo = 0; 
 // Declare a char board saving colors of tiles and position of A,B,C,D at each turn
@@ -206,11 +205,11 @@ void calculateScore(int scoreBoard[][N]) {
     tilePointOne = 0, tilePointTwo = 0;
      for(int i = 0; i < M; ++i) {
         for(int j = 0; j < N; ++j) {
-            if(stateBoard[i][j] == 'A')  {
+            if(stateBoard[i][j] == 'Y')  {
                tilePointOne += scoreBoard[i][j];
             //    cout << scoreBoard[i][j] << ' ';
             }
-            else if(stateBoard[i][j] == 'C')  {
+            else if(stateBoard[i][j] == 'Z')  {
                 tilePointTwo += scoreBoard[i][j];
                 // cout << scoreBoard[i][j] << ' ';
             }
@@ -219,7 +218,51 @@ void calculateScore(int scoreBoard[][N]) {
     }
 }
 
-//  Y: Red - Z: Blue
+//  Y: Red - Z: Blue | A,B: Red - C,D: Blue
+void checkRemoveDifferentColor() {
+    // Check if the position that agent moves to had color
+    // If that's true, remove the color and remain current position of agent
+    if(stateBoard[A1][A2] == 'Z') {
+        stateBoard[A1][A2] = 'x';
+        A1 = saveA1, A2 = saveA2;
+    } 
+    if(stateBoard[B1][B2] == 'Z') {
+        stateBoard[B1][B2] = 'x';
+        B1 = saveB1, B2 = saveB2;
+    }
+    if(stateBoard[C1][C2] == 'Y') {
+        stateBoard[C1][C2] = 'x';
+        C1 = saveC1, C2 = saveC2;
+    }
+    if(stateBoard[D1][D2] == 'Y') {
+        stateBoard[D1][D2] = 'x';
+        D1 = saveD1, D2 = saveD2;
+    } 
+}
+
+void checkMoveToSamePosition() {
+       // Check whether 2 agents move to a same position  ---->  CONFLICT  
+       // If 2 agents move to a same position, remain their current positions
+       if(A1 == B1 && A2 == B2)   A1 = saveA1, A2 = saveA2, B1 = saveB1, B2 = saveB2;
+       if(A1 == C1 && A2 == C2)   A1 = saveA1, A2 = saveA2, C1 = saveC1, C2 = saveC2;
+       if(A1 == D1 && A2 == D2)   A1 = saveA1, A2 = saveA2, D1 = saveD1, D2 = saveD2;
+       if(B1 == C1 && B2 == C2)   B1 = saveB1, B2 = saveB2, C1 = saveC1, C2 = saveC2;
+       if(B1 == D1 && B2 == D2)   B1 = saveB1, B2 = saveB2, D1 = saveD1, D2 = saveD2;
+       if(C1 == D1 && C2 == D2)   C1 = saveC1, C2 = saveC2, D1 = saveD1, D2 = saveD2;
+}
+
+void checkMoveToOtherAgentPosition() {
+       // Check whether 2 agents move to current position of the other  ---->  CONFLICT  
+       // If 2 agents move to current position of the other, remain their current positions
+       if(A1 == saveB1 && A2 == saveB2 && saveA1 == B1 && saveA2 == B2)   A1 = saveA1, A2 = saveA2, B1 = saveB1, B2 = saveB2;
+       if(A1 == saveC1 && A2 == saveC2 && saveA1 == C1 && saveA2 == C2)   A1 = saveA1, A2 = saveA2, C1 = saveC1, C2 = saveC2;
+       if(A1 == saveD1 && A2 == saveD2 && saveA1 == D1 && saveA2 == D2)   A1 = saveA1, A2 = saveA2, D1 = saveD1, D2 = saveD2;
+       if(B1 == saveC1 && B2 == saveC2 && saveB1 == C1 && saveB2 == C2)   B1 = saveB1, B2 = saveB2, C1 = saveC1, C2 = saveC2;
+       if(B1 == saveD1 && B2 == saveD2 && saveB1 == D1 && saveB2 == D2)   B1 = saveB1, B2 = saveB2, D1 = saveD1, D2 = saveD2;
+       if(C1 == saveD1 && C2 == saveD2 && saveC1 == D1 && saveC2 == D2)   C1 = saveC1, C2 = saveC2, D1 = saveD1, D2 = saveD2;
+}
+
+//  Y: Red - Z: Blue | A,B: Red - C,D: Blue
 void showGameBoard(int scoreBoard[][N]) {  
   for(int j = 0; j < N; ++j) cout << "------";
     cout << endl;
@@ -278,8 +321,6 @@ int main() {
     int countTurn = 0;
     // Declare user input
     int playerOneStepA = 0, playerOneStepB = 0, playerTwoStepC = 0, playerTwoStepD = 0; 
-    // Variables for saving A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) to check the conflict
-    int saveA1 = 1, saveA2 = 1, saveB1 = M-2, saveB2 = N-2, saveC1 = 1, saveC2 = N-2, saveD1 = M-2, saveD2 = 1;
     areaPointOne = 0, areaPointTwo = 0, sumOne = 0, sumTwo = 0; 
     
     // Generate empty state board
@@ -346,15 +387,10 @@ int main() {
        cin >> playerOneStepA >> playerOneStepB >> playerTwoStepC >> playerTwoStepD;
        updateA(playerOneStepA), updateB(playerOneStepB), updateC(playerTwoStepC), updateD(playerTwoStepD); 
        
-       // Check whether 2 agents move to a same position    
-       // If 2 agents move to a same position, remain their current positions
-       if(A1 == B1 && A2 == B2)   A1 = saveA1, A2 = saveA2, B1 = saveB1, B2 = saveB2;
-       if(A1 == C1 && A2 == C2)   A1 = saveA1, A2 = saveA2, C1 = saveC1, C2 = saveC2;
-       if(A1 == D1 && A2 == D2)   A1 = saveA1, A2 = saveA2, D1 = saveD1, D2 = saveD2;
-       if(B1 == C1 && B2 == C2)   B1 = saveB1, B2 = saveB2, C1 = saveC1, C2 = saveC2;
-       if(B1 == D1 && B2 == D2)   B1 = saveB1, B2 = saveB2, D1 = saveD1, D2 = saveD2;
-       if(C1 == D1 && C2 == D2)   C1 = saveC1, C2 = saveC2, D1 = saveD1, D2 = saveD2;
-
+    //  Functions for checking many laws of game
+       checkMoveToSamePosition();
+       checkRemoveDifferentColor();
+       checkMoveToOtherAgentPosition();
        ++countTurn;
     }
 
