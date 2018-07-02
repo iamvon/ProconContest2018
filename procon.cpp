@@ -49,7 +49,7 @@ using namespace std;
 
 #define   M      10
 #define   N      10
-#define   TURN   10
+#define   TURN   30
 
 //  Declare A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) coordinates as global variables
 int A1 = 1, A2 = 1, B1 = M-2, B2 = N-2, C1 = 1, C2 = N-2, D1 = M-2, D2 = 1;  
@@ -243,12 +243,18 @@ void checkRemoveDifferentColor() {
 void checkMoveToSamePosition() {
        // Check whether 2 agents move to a same position  ---->  CONFLICT  
        // If 2 agents move to a same position, remain their current positions
-       if(A1 == B1 && A2 == B2)   A1 = saveA1, A2 = saveA2, B1 = saveB1, B2 = saveB2;
+       if(A1 == B1 && A2 == B2) {
+           if(stateBoard[A1][A2] == 'Z')  stateBoard[A1][A2] = 'x';  // check to remove tile's color of opponent team
+           A1 = saveA1, A2 = saveA2, B1 = saveB1, B2 = saveB2;
+       }
        if(A1 == C1 && A2 == C2)   A1 = saveA1, A2 = saveA2, C1 = saveC1, C2 = saveC2;
        if(A1 == D1 && A2 == D2)   A1 = saveA1, A2 = saveA2, D1 = saveD1, D2 = saveD2;
        if(B1 == C1 && B2 == C2)   B1 = saveB1, B2 = saveB2, C1 = saveC1, C2 = saveC2;
        if(B1 == D1 && B2 == D2)   B1 = saveB1, B2 = saveB2, D1 = saveD1, D2 = saveD2;
-       if(C1 == D1 && C2 == D2)   C1 = saveC1, C2 = saveC2, D1 = saveD1, D2 = saveD2;
+       if(C1 == D1 && C2 == D2) {
+           if(stateBoard[C1][C2] == 'Y')  stateBoard[C1][C2] = 'x';  // check to remove tile's color of opponent team
+           C1 = saveC1, C2 = saveC2, D1 = saveD1, D2 = saveD2;
+       }
 }
 
 void checkMoveToOtherAgentPosition() {
