@@ -44,12 +44,21 @@
 #include<iostream>
 #include <ctime>
 #include <cstdlib>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
+const string red("\033[0;41m");
+const string green("\033[1;32m");
+const string yellow("\033[1;33m");
+const string cyan("\033[0;44m");
+const string magenta("\033[0;35m");
+const string reset("\033[0m");
+
 #define   M      10     //  MODIFY HERE
 #define   N      12     //  MODIFY HERE
-#define   TURN   30
+#define   TURN   60
 
 //  Declare A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) coordinates as global variables
 int A1 = 1, A2 = 1, B1 = M-2, B2 = N-2, C1 = 1, C2 = N-2, D1 = M-2, D2 = 1;      //  MODIFY HERE
@@ -270,12 +279,18 @@ void checkMoveToOtherAgentPosition() {
 
 //  Y: Red - Z: Blue | A,B: Red - C,D: Blue
 void showGameBoard(int scoreBoard[][N]) {  
-  for(int j = 0; j < N; ++j) cout << "------";
+  for(int j = 0; j < N; ++j) cout << FGRN("------");
     cout << endl;
     // cout << endl;
     for(int i = 0; i < M; ++i) {
         for(int j = 0; j < N; ++j) {
-            cout << "|  ";
+            if(stateBoard[i][j] == 'Y') {
+               cout << FGRN("| ") << red << " " << reset ;    
+            }
+            else if (stateBoard[i][j] == 'Z') {
+               cout << FGRN("| ") << cyan << " " << reset ;    
+            }
+            else cout << FGRN("|  ");
             // Show the game board with "@" for tiles's colors and show position of A,B,C,D
             // Save to the state board 'Y' for red tiles and 'Z' for blue tiles
             if((i == A1 && j == A2) || ((i == A1 && j == A2) && stateBoard[i][j] == 'Y' ))  {
@@ -316,14 +331,16 @@ void showGameBoard(int scoreBoard[][N]) {
             }
             // Show saved "@" in the state board
             else if(stateBoard[i][j] == 'Y')  {
-                cout << '\b' <<  FRED("@") << scoreBoard[i][j]; 
-                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << "  ";
+                if(scoreBoard[i][j] <= -10) cout << '\b' << red << scoreBoard[i][j] << reset << " ";
+                else cout << red << scoreBoard[i][j] << reset; 
+                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << red << " " << reset << " ";
                 else if(scoreBoard[i][j] <= -10) cout << "";
                 else cout << ' ';
             }
             else if(stateBoard[i][j] == 'Z')   {
-                cout << '\b' <<  FBLU("@") << scoreBoard[i][j];
-                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << "  ";
+                if(scoreBoard[i][j] <= -10) cout << '\b' << cyan << scoreBoard[i][j] << reset << " ";
+                else cout << cyan << scoreBoard[i][j] << reset;
+                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << cyan << " " << reset << " ";
                 else if(scoreBoard[i][j] <= -10) cout << "";
                 else cout << ' ';
             }
@@ -332,9 +349,9 @@ void showGameBoard(int scoreBoard[][N]) {
             else if (scoreBoard[i][j] <= -10) cout << scoreBoard[i][j] << "";
             else cout << scoreBoard[i][j] << " ";
         }
-        cout << "|  ";
+        cout << FGRN("|  ");
         cout << endl;
-        for(int j = 0; j < N; ++j) cout << "------";
+        for(int j = 0; j < N; ++j) cout << FGRN("------");
         cout << endl;
         // cout << endl;
     }
@@ -343,6 +360,7 @@ void showGameBoard(int scoreBoard[][N]) {
 }
 
 int main() {
+
     srand(time(NULL));
     int scoreBoard[M][N], gameBoard[M][N];
     int quarterBoard[M/2][N/2];
@@ -427,7 +445,7 @@ int main() {
        cout << "TURN " << countTurn << endl;
         
        showGameBoard(gameBoard);          
-       cout << "                                                                    tilePointOne: " << tilePointOne << "       tilePointTwo: " << tilePointTwo << endl;
+       cout << "                                                                                      tilePointOne: " << tilePointOne << "       tilePointTwo: " << tilePointTwo << endl;
        cout << endl;
      //  Save current positions of 2 agents
        saveA1 = A1, saveA2 = A2, saveB1 = B1, saveB2 = B2, saveC1 = C1, saveC2 = C2, saveD1 = D1, saveD2 = D2;
