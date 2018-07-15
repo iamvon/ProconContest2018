@@ -47,12 +47,12 @@
 
 using namespace std;
 
-#define   M      10
-#define   N      10
+#define   M      10     //  MODIFY HERE
+#define   N      12     //  MODIFY HERE
 #define   TURN   30
 
 //  Declare A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) coordinates as global variables
-int A1 = 1, A2 = 1, B1 = M-2, B2 = N-2, C1 = 1, C2 = N-2, D1 = M-2, D2 = 1;  
+int A1 = 1, A2 = 1, B1 = M-2, B2 = N-2, C1 = 1, C2 = N-2, D1 = M-2, D2 = 1;      //  MODIFY HERE
 // Variables for saving A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) to check the conflict
 int saveA1 = 1, saveA2 = 1, saveB1 = M-2, saveB2 = N-2, saveC1 = 1, saveC2 = N-2, saveD1 = M-2, saveD2 = 1;
 // Declare point types as global variables   
@@ -282,31 +282,54 @@ void showGameBoard(int scoreBoard[][N]) {
                 if(stateBoard[i][j] == 'x')  stateBoard[i][j] = 'Y'; 
                 // else if(stateBoard[i][j] == 'C')  stateBoard[i][j] = 'x';
                 tilePointOne += scoreBoard[i][j];
-                cout <<  FRED("A") << "  ";
+                cout << '\b' <<  FRED("A") << scoreBoard[i][j];
+                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << "  ";
+                else if(scoreBoard[i][j] <= -10) cout << "";
+                else cout << ' ';
             }
             else if((i == B1 && j == B2) || ((i == B1 && j == B2) && stateBoard[i][j] == 'Y'))  {
                 if(stateBoard[i][j] == 'x')  stateBoard[i][j] = 'Y'; 
                 // else if(stateBoard[i][j] == 'C')  stateBoard[i][j] = 'x';
                 tilePointOne += scoreBoard[i][j];
-                cout <<  FRED("B") << "  ";
+                cout << '\b' <<  FRED("B") << scoreBoard[i][j];
+                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << "  ";
+                else if(scoreBoard[i][j] <= -10) cout << "";
+                else cout << ' ';
             }
             else if((i == C1 && j == C2) || ((i == C1 && j == C2) && stateBoard[i][j] == 'Z'))  {
                 if(stateBoard[i][j] == 'x')  stateBoard[i][j] = 'Z'; 
                 // else if(stateBoard[i][j] == 'A')  stateBoard[i][j] = 'x';
                 tilePointTwo += scoreBoard[i][j];
-                cout <<  FBLU("C") << "  ";
+                cout << '\b' <<  FBLU("C") << scoreBoard[i][j];
+                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << "  ";
+                else if(scoreBoard[i][j] <= -10) cout << "";
+                else cout << ' ';
             }
             else if((i == D1 && j == D2) || ((i == D1 && j == D2) && stateBoard[i][j] == 'Z'))  {
                 if(stateBoard[i][j] == 'x')  stateBoard[i][j] = 'Z'; 
                 // else if(stateBoard[i][j] == 'A')  stateBoard[i][j] = 'x';
                 tilePointTwo += scoreBoard[i][j];
-                cout <<  FBLU("D") << "  ";
+                cout << '\b' <<  FBLU("D") << scoreBoard[i][j];
+                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << "  ";
+                else if(scoreBoard[i][j] <= -10) cout << "";
+                else cout << ' ';
             }
             // Show saved "@" in the state board
-            else if(stateBoard[i][j] == 'Y')  cout <<  FRED("@") << "  ";
-            else if(stateBoard[i][j] == 'Z')   cout <<  FBLU("@") << "  ";
+            else if(stateBoard[i][j] == 'Y')  {
+                cout << '\b' <<  FRED("@") << scoreBoard[i][j]; 
+                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << "  ";
+                else if(scoreBoard[i][j] <= -10) cout << "";
+                else cout << ' ';
+            }
+            else if(stateBoard[i][j] == 'Z')   {
+                cout << '\b' <<  FBLU("@") << scoreBoard[i][j];
+                if(scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << "  ";
+                else if(scoreBoard[i][j] <= -10) cout << "";
+                else cout << ' ';
+            }
             // Show the rest of game board with scores without tiles
             else if (scoreBoard[i][j] >= 0 && scoreBoard[i][j] < 10) cout << scoreBoard[i][j] << "  ";
+            else if (scoreBoard[i][j] <= -10) cout << scoreBoard[i][j] << "";
             else cout << scoreBoard[i][j] << " ";
         }
         cout << "|  ";
@@ -327,7 +350,9 @@ int main() {
     int countTurn = 0;
     // Declare user input
     int playerOneStepA = 0, playerOneStepB = 0, playerTwoStepC = 0, playerTwoStepD = 0; 
-    areaPointOne = 0, areaPointTwo = 0, sumOne = 0, sumTwo = 0; 
+    areaPointOne = 0, areaPointTwo = 0, sumOne = 0, sumTwo = 0;
+    char checkInput, skip; 
+    int scoreInput;
     
     // Generate empty state board
     for(int i = 0; i < M; ++i) {
@@ -335,7 +360,22 @@ int main() {
             stateBoard[i][j] = 'x';
         }
     }
-    // Generate score board
+    // Check Input Mode
+    cout << "Map input ? (y/n): ";
+    cin >> checkInput;
+    if(checkInput == 'y') {
+       // Map input
+       cout << "Map: ";
+       for(int i = 0; i < M; ++i) {
+        for(int j = 0; j < N; ++j) {
+            cin >> scoreInput; 
+            scoreBoard[i][j] = scoreInput;
+        }
+        cin >> skip;
+    }
+    }
+    else {
+       // Generate score board
     for(int i = 0; i < M/2; ++i) {
         for(int j = 0; j < N/2; ++j) {
             quarterBoard[i][j] = randomNumber(-5, 20);
@@ -369,6 +409,8 @@ int main() {
         }
         col = 0, ++row;
     }
+    }
+    
     // Initialize the game board as score board
     for(int i = 0; i < M; ++i) {
         for(int j = 0; j < N; ++j) {
