@@ -56,7 +56,7 @@ const string cyan("\033[0;44m");
 const string magenta("\033[0;35m");
 const string reset("\033[0m");
 
-#define   M      8     //  MODIFY HERE
+#define   M      10     //  MODIFY HERE
 #define   N      11     //  MODIFY HERE
 #define   TURN   60
 
@@ -67,7 +67,7 @@ int saveA1 = A1, saveA2 = A2, saveB1 = B1, saveB2 = B2, saveC1 = C1, saveC2 = C2
 // Declare point types as global variables   
 int tilePointOne = 0, tilePointTwo = 0, areaPointOne = 0, areaPointTwo = 0, sumOne = 0, sumTwo = 0; 
 // Declare a char board saving colors of tiles and position of A,B,C,D at each turn
-char stateBoard[M][N]; 
+char stateBoard[M][N], saveBackStateBoard[M][N]; 
 
 int randomNumber(int minNum, int maxNum) {
    return rand()%(maxNum - minNum + 1) + minNum;
@@ -379,6 +379,13 @@ int main() {
             stateBoard[i][j] = 'x';
         }
     }
+
+    // Generate empty saveBackStateBoard
+    for(int i = 0; i < M; ++i) {
+        for(int j = 0; j < N; ++j) {
+            saveBackStateBoard[i][j] = stateBoard[i][j];
+        }
+    }
     // Check Input Mode
     cout << "Map input ? (y/n): ";
     cin >> checkInput;
@@ -397,7 +404,7 @@ int main() {
        // Generate score board
     for(int i = 0; i < M/2; ++i) {
         for(int j = 0; j < N/2; ++j) {
-            quarterBoard[i][j] = randomNumber(-10, 20);
+            quarterBoard[i][j] = randomNumber(-9, 20);
         }
     }
     for(int i = 0; i < M/2; ++i) {
@@ -454,15 +461,23 @@ int main() {
        cin >> playerOneStepA >> playerOneStepB >> playerTwoStepC >> playerTwoStepD;
        // Back 
        if (playerOneStepA == 0 && playerOneStepB == 0 && playerTwoStepC == 0 && playerTwoStepD == 0) {
-          for(int i = 0; i < M; ++i) {
-          for(int j = 0; j < N; ++j) {
-           if(stateBoard[i][j] == 'Y' && ((i == A1 && j == A2) || (i == B1 && j == B2)))  stateBoard[i][j] = 'x';
-           if(stateBoard[i][j] == 'Z' && ((i == C1 && j == C2) || (i == D1 && j == D2)))  stateBoard[i][j] = 'x'; 
-        }
-    }
+          // Back state board
+            for(int i = 0; i < M; ++i) {
+              for(int j = 0; j < N; ++j) {
+                stateBoard[i][j] = saveBackStateBoard[i][j];
+         }
+      }
+    // Back coordinates
     A1 = saveBackA1, A2 = saveBackA2, B1 = saveBackB1, B2 = saveBackB2, C1 = saveBackC1, C2 = saveBackC2, D1 = saveBackD1, D2 = saveBackD2;
        }
        else {
+           // Save state board
+          for(int i = 0; i < M; ++i) {
+            for(int j = 0; j < N; ++j) {
+            saveBackStateBoard[i][j] = stateBoard[i][j];
+        }
+       }  
+       // Save coordinates
         saveBackA1 = saveA1, saveBackA2 = saveA2, saveBackB1 = saveB1, saveBackB2 = saveB2, saveBackC1 = saveC1, saveBackC2 = saveC2, saveBackD1 = saveD1, saveBackD2 = saveD2;   
         updateA(playerOneStepA), updateB(playerOneStepB), updateC(playerTwoStepC), updateD(playerTwoStepD); 
     //  Functions for checking many laws of game
