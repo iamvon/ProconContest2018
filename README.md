@@ -8,3 +8,4 @@
 - Đã check được "Remove" khi Agent của team này nhận lệnh "Move" tới tile đã được tô màu của team kia.
 - Đã tính được tilePoint của 2 team.
 - Đã thêm option nhập map.
+- 
