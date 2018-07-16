@@ -56,14 +56,14 @@ const string cyan("\033[0;44m");
 const string magenta("\033[0;35m");
 const string reset("\033[0m");
 
-#define   M      10     //  MODIFY HERE
-#define   N      12     //  MODIFY HERE
+#define   M      8     //  MODIFY HERE
+#define   N      11     //  MODIFY HERE
 #define   TURN   60
 
 //  Declare A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) coordinates as global variables
-int A1 = 1, A2 = 1, B1 = M-2, B2 = N-2, C1 = 1, C2 = N-2, D1 = M-2, D2 = 1;      //  MODIFY HERE
+int A1 = 0, A2 = 0, B1 = 7, B2 = 10, C1 = 0, C2 = 10, D1 = 7, D2 = 0;      //  MODIFY HERE
 // Variables for saving A(A1,A2), B(B1,B2), C(C1,C2), D(D1,D2) to check the conflict
-int saveA1 = 1, saveA2 = 1, saveB1 = M-2, saveB2 = N-2, saveC1 = 1, saveC2 = N-2, saveD1 = M-2, saveD2 = 1;
+int saveA1 = A1, saveA2 = A2, saveB1 = B1, saveB2 = B2, saveC1 = C1, saveC2 = C2, saveD1 = D1, saveD2 = D2;
 // Declare point types as global variables   
 int tilePointOne = 0, tilePointTwo = 0, areaPointOne = 0, areaPointTwo = 0, sumOne = 0, sumTwo = 0; 
 // Declare a char board saving colors of tiles and position of A,B,C,D at each turn
@@ -368,6 +368,7 @@ int main() {
     int countTurn = 0;
     // Declare user input
     int playerOneStepA = 0, playerOneStepB = 0, playerTwoStepC = 0, playerTwoStepD = 0; 
+    int saveBackA1 = A1, saveBackA2 = A2, saveBackB1 = B1, saveBackB2 = B2, saveBackC1 = C1, saveBackC2 = C2, saveBackD1 = D1, saveBackD2 = D2;
     areaPointOne = 0, areaPointTwo = 0, sumOne = 0, sumTwo = 0;
     char checkInput, skip; 
     int scoreInput;
@@ -396,7 +397,7 @@ int main() {
        // Generate score board
     for(int i = 0; i < M/2; ++i) {
         for(int j = 0; j < N/2; ++j) {
-            quarterBoard[i][j] = randomNumber(-5, 20);
+            quarterBoard[i][j] = randomNumber(-10, 20);
         }
     }
     for(int i = 0; i < M/2; ++i) {
@@ -451,13 +452,25 @@ int main() {
        saveA1 = A1, saveA2 = A2, saveB1 = B1, saveB2 = B2, saveC1 = C1, saveC2 = C2, saveD1 = D1, saveD2 = D2;
        cout << "Nhập nước đi tương ứng của A,B,C,D (1,2,3,4,5,6,7,8,9): " << endl;
        cin >> playerOneStepA >> playerOneStepB >> playerTwoStepC >> playerTwoStepD;
-       updateA(playerOneStepA), updateB(playerOneStepB), updateC(playerTwoStepC), updateD(playerTwoStepD); 
-       
+       // Back 
+       if (playerOneStepA == 0 && playerOneStepB == 0 && playerTwoStepC == 0 && playerTwoStepD == 0) {
+          for(int i = 0; i < M; ++i) {
+          for(int j = 0; j < N; ++j) {
+           if(stateBoard[i][j] == 'Y' && ((i == A1 && j == A2) || (i == B1 && j == B2)))  stateBoard[i][j] = 'x';
+           if(stateBoard[i][j] == 'Z' && ((i == C1 && j == C2) || (i == D1 && j == D2)))  stateBoard[i][j] = 'x'; 
+        }
+    }
+    A1 = saveBackA1, A2 = saveBackA2, B1 = saveBackB1, B2 = saveBackB2, C1 = saveBackC1, C2 = saveBackC2, D1 = saveBackD1, D2 = saveBackD2;
+       }
+       else {
+        saveBackA1 = saveA1, saveBackA2 = saveA2, saveBackB1 = saveB1, saveBackB2 = saveB2, saveBackC1 = saveC1, saveBackC2 = saveC2, saveBackD1 = saveD1, saveBackD2 = saveD2;   
+        updateA(playerOneStepA), updateB(playerOneStepB), updateC(playerTwoStepC), updateD(playerTwoStepD); 
     //  Functions for checking many laws of game
        checkMoveToSamePosition();
        checkRemoveDifferentColor();
        checkMoveToOtherAgentPosition();
        ++countTurn;
+       }
     }
 
     return 0;
